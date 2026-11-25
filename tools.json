@@ -1,0 +1,5229 @@
+{
+  "tools": [
+    {
+      "name": "list_files",
+      "description": "List files and folders inside the workspace.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "read_file",
+      "description": "Read a text file from the workspace. Returns at most the first 100,000 characters; use read_lines for big files.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "write_file",
+      "description": "Create or overwrite a text file in the workspace. Missing folders are created.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ]
+      }
+    },
+    {
+      "name": "make_dir",
+      "description": "Create a folder inside the workspace.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "create_web_project",
+      "description": "Create projects/<name> with index.html, style.css and script.js. Link the CSS and JS from index.html with relative paths. The dashboard can preview it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "css": {
+            "type": "string"
+          },
+          "js": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "html"
+        ]
+      }
+    },
+    {
+      "name": "web_search",
+      "description": "Search the web and return titles, links and snippets.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "scrape_page",
+      "description": "Fetch a public web page and return its readable text. Pages that need a login are not supported.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "max_chars": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "download_file",
+      "description": "Download a public file into downloads/. Downloads need the user's approval in the dashboard unless the connection is trusted (approved downloads up to 300 MB): call once to request it, then call again with the approval_id the tool returns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "filename"
+        ]
+      }
+    },
+    {
+      "name": "wait_approval",
+      "description": "Hold the call open until every listed approval is approved, then reply Accepted!. approval_ids is a comma-separated list of request ids. Returns at once if any request is denied or expired. Waits at most timeout_s seconds (max 45). If the reply says still waiting, call it again with the same ids.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_ids": {
+            "type": "string"
+          },
+          "timeout_s": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "approval_ids"
+        ]
+      }
+    },
+    {
+      "name": "multi_run",
+      "description": "Run up to 10 tool calls at once in parallel. calls is a JSON list such as [{\"tool\": \"read_file\", \"arguments\": {\"path\": \"notes.txt\"}}]. Results come back in the same order. Approval-gated tools still need their own approval_id. multi_run cannot call itself.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calls": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "calls"
+        ]
+      }
+    },
+    {
+      "name": "read_lines",
+      "description": "Read a range of lines from a workspace text file. start is the first line number (1 is the first line). count is how many lines to read, up to 1000. Use this to read big files in parts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "start": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "append_file",
+      "description": "Add text to the end of a workspace file. Creates the file if it does not exist.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ]
+      }
+    },
+    {
+      "name": "move_file",
+      "description": "Rename or move a file or folder inside the workspace. Refuses to overwrite anything that already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "destination"
+        ]
+      }
+    },
+    {
+      "name": "search_files",
+      "description": "Search for text inside workspace files under a folder. Returns file paths and line numbers, up to 100 matches. Skips files over 2 MB and non-text files.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "get_activity",
+      "description": "Show the most recent activity log entries: tool calls, download requests and approvals. limit is how many entries to show, up to 200.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "build_icon_library",
+      "description": "Build the css.gg library in library/css-gg: all-icons.css (every icon's CSS in one file) and icon-index.txt (name, tags and class for each icon). Run this after the icon pack is downloaded.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "search_icons",
+      "description": "Search the css.gg icon pack by name or tag. Returns the name, tags and class name for each match, up to 200.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "get_icon",
+      "description": "Return one css.gg icon's HTML, CSS and SVG. The HTML needs the CSS, so link library/css-gg/all-icons.css or paste the CSS into the page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "list_projects",
+      "description": "List the web projects in projects/ and where each one previews on the dashboard.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "list_tree",
+      "description": "List files and folders inside a workspace folder, including subfolders. Shows up to 1000 entries.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "max_entries": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "copy_file",
+      "description": "Copy a file inside the workspace. Refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "destination"
+        ]
+      }
+    },
+    {
+      "name": "file_info",
+      "description": "Show a file's or folder's type, size and last-modified time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "delete_file",
+      "description": "Delete one file in the workspace (not folders). The user must approve it in the dashboard first. Call once without approval_id to request approval, then call again with the same path and the approval_id the tool returns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "make_archive",
+      "description": "Zip a workspace folder into downloads/<name>.zip. Zip a subfolder, not the whole workspace or downloads. Refuses folders over 300 MB.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "extract_zip",
+      "description": "Unzip a .zip file in the workspace into a folder (default: the zip's own folder). Refuses to overwrite existing files, paths that escape the folder, archives with more than 5000 files, or archives that expand past 300 MB.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "untar_archive",
+      "description": "Unpack a .tgz or .tar.gz archive in the workspace into a folder (default: the archive's name).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "list_archive",
+      "description": "List what is inside a .zip or .tgz archive in the workspace without unpacking it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "file_hash",
+      "description": "Compute a file's checksum. algo can be sha256, sha1 or md5.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "algo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "disk_usage",
+      "description": "Show the total size of each item in a workspace folder, largest first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "find_large_files",
+      "description": "Find workspace files at least min_mb megabytes in size, largest first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "min_mb": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "count_lines",
+      "description": "Count the lines in a workspace file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "library_manifest",
+      "description": "List every file under a folder with its size, and the total.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "write_library_index",
+      "description": "Save the file list and total size of a folder as INDEX.md inside that folder.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "validate_json",
+      "description": "Check whether a workspace file contains valid JSON.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "pretty_json",
+      "description": "Return a workspace JSON file pretty-printed. Does not change the file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "max_chars": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "csv_preview",
+      "description": "Show the first rows of a CSV file in the workspace.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "base64_encode",
+      "description": "Return a small workspace file (up to 2 MB) as base64 text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "text_replace",
+      "description": "Replace every occurrence of some text in one workspace file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "old": {
+            "type": "string"
+          },
+          "new": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "old",
+          "new"
+        ]
+      }
+    },
+    {
+      "name": "tail_file",
+      "description": "Show the last lines of a workspace file, useful for logs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "find_duplicates",
+      "description": "Find workspace files with identical content under a folder.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "check_url",
+      "description": "Check whether a public web address responds, and return its HTTP status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "extension_summary",
+      "description": "Count files by extension under a workspace folder, most common first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "now_utc",
+      "description": "Return the current time in UTC (ISO format).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "word_count",
+      "description": "Count the words in a workspace text file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "json_keys",
+      "description": "List the top-level keys of a workspace JSON object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "project_files",
+      "description": "List every file in a project folder with its size.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_read",
+      "description": "Read one file from a project folder (for example index.html or style.css). Returns up to 100,000 characters.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "file"
+        ]
+      }
+    },
+    {
+      "name": "project_write",
+      "description": "Create or overwrite one file in a project folder. Use this to edit index.html, style.css or script.js.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "file",
+          "content"
+        ]
+      }
+    },
+    {
+      "name": "project_outline",
+      "description": "List the headings (h1 to h6) in a project's index.html, in order.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_links",
+      "description": "List every href and src in a project's index.html.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_check_links",
+      "description": "Check that every local file the project's index.html points to exists inside the project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_colors",
+      "description": "List the hex colors used in a project's HTML and CSS, most used first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_fonts",
+      "description": "List the font-family values used in a project's HTML and CSS.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_scripts",
+      "description": "List the script files a project loads and whether each one exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_size",
+      "description": "Show how many files a project has and their total size.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_title",
+      "description": "Show the page title from a project's index.html.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_meta",
+      "description": "List the meta tags in a project's index.html.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_images",
+      "description": "List the images in a project's index.html and whether each has alt text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_accessibility",
+      "description": "Run basic accessibility checks on a project's index.html: lang, alt text, button text, labels.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_seo",
+      "description": "Run basic SEO checks on a project's index.html: title length, description, heading count.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_duplicate_ids",
+      "description": "Find id attributes used more than once in a project's index.html.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_js_functions",
+      "description": "List the named functions and arrow-function constants in a project's script.js.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_clone",
+      "description": "Copy a project into a new project folder with a new name. Refuses if the new name already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "new_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "new_name"
+        ]
+      }
+    },
+    {
+      "name": "project_rename",
+      "description": "Rename a project folder. Refuses if the new name already exists. Preview links change to the new name.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "new_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "new_name"
+        ]
+      }
+    },
+    {
+      "name": "project_snapshot",
+      "description": "Save a timestamped copy of a project into backups/ before you change it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_zip",
+      "description": "Zip a whole project into downloads/<name>-project.zip for sharing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_minify_css",
+      "description": "Write style.min.css in a project: a smaller copy of style.css with comments and spaces removed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_word_count",
+      "description": "Count the visible words in a project's index.html (scripts and styles excluded).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "site_headers",
+      "description": "Show the HTTP response headers a public site sends.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_redirects",
+      "description": "Show the redirect chain for a public URL and the final address.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_title",
+      "description": "Show the page title of a public URL.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_meta",
+      "description": "List the meta tags of a public page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_open_graph",
+      "description": "List the Open Graph tags (og:*) of a public page, used for link previews.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_links",
+      "description": "List the links on a public page, with internal and external counts. Shows up to 100 links.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_broken_links",
+      "description": "Check up to 30 internal links on a public page and report the ones that fail (HTTP 400 or more).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_images",
+      "description": "List the images on a public page, and which ones have no alt text. Shows up to 100.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_scripts",
+      "description": "List the script files a public page loads.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_stylesheets",
+      "description": "List the stylesheets a public page loads.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_forms",
+      "description": "List the forms on a public page with their method, action and fields.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_tech_hints",
+      "description": "Guess which common frameworks and libraries a public page uses, from its HTML.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_security_headers",
+      "description": "Check whether a public site sends the common security headers (CSP, HSTS, and others).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_cookies",
+      "description": "List the cookies a public site sets on the first visit (names only).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_robots",
+      "description": "Read the robots.txt file of a public site (first 3000 characters).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_sitemap",
+      "description": "Read the sitemap.xml of a public site and count the URLs in it (first 100 shown).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_favicon",
+      "description": "Find the favicon of a public site (from the page's link tags, or /favicon.ico).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_json_ld",
+      "description": "Show the structured data (JSON-LD) a public page declares, for search engines.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_accessibility",
+      "description": "Run basic accessibility checks on a public page: lang, alt text, button text, labels.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_mixed_content",
+      "description": "On an https page, list any resources loaded over insecure http.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_text_length",
+      "description": "Count the visible words on a public page (scripts and styles excluded).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_load_time",
+      "description": "Measure how long a public page takes to download, its status and its size.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_dns",
+      "description": "Show the IP addresses a public site's host name resolves to.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_ssl_expiry",
+      "description": "Show when a public site's HTTPS certificate expires.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_colors",
+      "description": "List the hex colors used in a public page's HTML and inline styles, most used first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_fonts",
+      "description": "List the font-family values used in a public page's HTML and inline styles.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "site_crawl",
+      "description": "Crawl a public site from one page, following links on the same host. Lists each page's title. max_pages is up to 20.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "max_pages": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_dump",
+      "description": "Load a public page in headless Chromium so its JavaScript runs, then return the readable text. Needs Chromium (pkg install chromium).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "max_chars": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_batch",
+      "description": "Take screenshots of up to 5 public pages in one go. urls is one address per line. Saves to screenshots/<prefix>-1.png and so on. Needs Chromium.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "string"
+          },
+          "prefix": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "urls"
+        ]
+      }
+    },
+    {
+      "name": "browser_get_html",
+      "description": "Return the rendered HTML of a public page after its JavaScript runs. Needs Chromium.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "max_chars": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_get_links",
+      "description": "List every link on a rendered public page, with its text and full target address. Needs Chromium.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_get_forms",
+      "description": "List the forms on a rendered public page with method, action and field names. Does not submit anything. Needs Chromium.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_list_assets",
+      "description": "List the stylesheets, scripts, images and other files a rendered public page loads, with full addresses. Needs Chromium.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_download_asset",
+      "description": "Save one asset into downloads/. Files up to 100 MB save automatically. Larger files need the dashboard approval.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "filename"
+        ]
+      }
+    },
+    {
+      "name": "browser_fullpage_screenshot",
+      "description": "Take one tall screenshot of a whole public page. Saves to screenshots/<name>.png. Height 800 to 12000. Needs Chromium.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "capture_site_pages",
+      "description": "Save rendered HTML, markdown text and a screenshot for up to 5 public pages (one address per line) into projects/experimental/<site>/. Needs Chromium.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "string"
+          },
+          "site": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "urls",
+          "site"
+        ]
+      }
+    },
+    {
+      "name": "capture_site_summary",
+      "description": "Write summary.md for a captured site: every file saved under projects/experimental/<site>/ with its size.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "site": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "site"
+        ]
+      }
+    },
+    {
+      "name": "browser_open_session",
+      "description": "Open a browser session on a public page that keeps cookies and page state between steps. Returns a session id. Needs Playwright.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_list_sessions",
+      "description": "List open browser sessions and the address each one is on.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "browser_close_session",
+      "description": "Close a browser session and forget its cookies and state.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_set_viewport",
+      "description": "Change the width and height of a browser session, for mobile or desktop captures.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "width",
+          "height"
+        ]
+      }
+    },
+    {
+      "name": "browser_click",
+      "description": "Click an element by its visible text or a CSS selector. Clicks that look like login, submit, accept, pay or approve need the user's approval: call once without approval_id to request it, then call again with the approval_id the tool returns after the user approves it in the dashboard.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "target"
+        ]
+      }
+    },
+    {
+      "name": "browser_type",
+      "description": "Type text into a field by CSS selector or label text. Password fields need the user's approval: call once to request it, then call again with the approval_id the tool returns after the user approves it in the dashboard.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "target",
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "browser_press_key",
+      "description": "Press a key in the page, for example Enter, Escape, Tab or ArrowDown.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "key"
+        ]
+      }
+    },
+    {
+      "name": "browser_scroll",
+      "description": "Scroll the page down by amount pixels (negative scrolls up), or scroll an element into view if target is given.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "target": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_hover",
+      "description": "Hover over an element by CSS selector or visible text, for menus that open on hover.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "target"
+        ]
+      }
+    },
+    {
+      "name": "browser_select_option",
+      "description": "Choose an option in a dropdown by CSS selector, given its value or visible label.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "target",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "browser_wait_for",
+      "description": "Wait until a text or CSS selector appears on the page, up to timeout_s seconds.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "text_or_selector": {
+            "type": "string"
+          },
+          "timeout_s": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "text_or_selector"
+        ]
+      }
+    },
+    {
+      "name": "browser_get_text",
+      "description": "Return the visible text of the current page in a session.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "max_chars": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_get_console",
+      "description": "Return the browser console messages collected in a session, for debugging.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_screenshot",
+      "description": "Take a screenshot of the current view in a session. Saves to screenshots/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "browser_scroll_capture",
+      "description": "Scroll the current page in a session one screen at a time and save one screenshot per screen to screenshots/<name>-N.png. Up to 12 frames.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "max_frames": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "browser_network_log",
+      "description": "List the requests a session loaded, with status code, method and address. No response bodies.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_storage_names",
+      "description": "List localStorage keys, sessionStorage keys and cookie names in a session. Values are never shown.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "web_session_open",
+      "description": "Open a web session on a public page. Sessions keep cookies between steps. Returns a session id, the title and the address.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "web_session_get",
+      "description": "Go to another page in a web session. A relative address is taken from the current page. Returns the title and the address.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "web_session_links",
+      "description": "List the links on the current page of a web session, as full addresses. Shows up to 100.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "web_session_forms",
+      "description": "List the forms on the current page of a web session, with their index, method, action and fields.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "web_session_submit",
+      "description": "Submit a form on the current page of a web session. fields is a JSON object of field names and values. The user must approve each submission in the dashboard first: call once without approval_id, then call again with the same arguments and the approval_id the tool returns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "form_index": {
+            "type": "integer"
+          },
+          "fields": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "form_index"
+        ]
+      }
+    },
+    {
+      "name": "web_session_close",
+      "description": "Close a web session and forget its cookies.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "web_sessions",
+      "description": "List the open web sessions and the address each one is on.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "screenshot_page",
+      "description": "Take a PNG screenshot of a public page or a dashboard preview link, using Chromium if installed (pkg install chromium). Saves to screenshots/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "view_image",
+      "description": "Show a PNG from the workspace as an image so Claude can see it. Use the path screenshot_page saved, e.g. screenshots/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "scroll_capture",
+      "description": "Walk a page section by section and return one settled screenshot per section (a frame-by-frame scroll, not a video). anchors is a comma list of section ids, e.g. top,house,rooms,day,tides,letters,footer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "anchors": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "screenshot_part",
+      "description": "Screenshot one part of a page: jump to a section id (e.g. house, rooms, day, tides, letters, footer; empty for the top), wait delay_ms so animations can finish, then return the image.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "section": {
+            "type": "string"
+          },
+          "delay_ms": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "web_to_pdf",
+      "description": "Save a web page or dashboard preview as a PDF in pdfs/<name>.pdf, after waiting delay_ms so animations can finish. Uses Chromium (pkg install chromium).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "delay_ms": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "check_html_basics",
+      "description": "Check a project's index.html for doctype, lang, title, viewport, meta description and exactly one h1.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_local_links",
+      "description": "List the local files a project's index.html points to (href, src, url()) and report any that are missing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_css_braces",
+      "description": "Check a project's CSS file for unbalanced { } braces and unclosed comments.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_js_syntax",
+      "description": "Check a project's JavaScript file for syntax errors using node (install in Termux with: pkg install nodejs).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_fonts_embedded",
+      "description": "Check a project's @font-face rules: each font must be embedded as a data URI or point to a file that exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_reduced_motion",
+      "description": "Check that a project's index.html (including any inlined CSS) has a prefers-reduced-motion rule.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_seo_tags",
+      "description": "Check a project's index.html for Open Graph and Twitter tags, a canonical link and a favicon.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_image_alt",
+      "description": "Check that every <img> in a project's index.html has alt text, and every role=img element has an aria-label.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_button_labels",
+      "description": "Check that every <button> in a project's index.html has visible text or an aria-label.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "check_project_size",
+      "description": "Report a project's total size and flag it if it is over the 16 MB page limit or has a file over 2 MB.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_info",
+      "description": "Report a video's duration, size, dimensions, frame rate and whether it has audio (uses ffprobe).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "video_trim",
+      "description": "Cut a video from start_s to end_s (seconds) into videos/<name>.mp4. Use end_s 0 for the end of the video.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start_s": {
+            "type": "number"
+          },
+          "end_s": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_speed",
+      "description": "Speed a video up (factor above 1) or slow it down (factor below 1) into videos/<name>.mp4. Drops the audio.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "factor": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_mute",
+      "description": "Remove the audio track from a video into videos/<name>.mp4, keeping the picture as it is.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_concat",
+      "description": "Join several videos (comma-separated workspace paths, in order) into videos/<name>.mp4. Videos should share a size and frame rate.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "paths",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_frames",
+      "description": "Grab still frames from a video every every_s seconds (up to max_frames) into videos/<name>-frames/ and return them as images.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "every_s": {
+            "type": "number"
+          },
+          "max_frames": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_frame_at",
+      "description": "Save one still frame at at_s seconds into videos/<name>.png and return it as an image.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "at_s": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_gif",
+      "description": "Make an animated GIF from part of a video into videos/<name>.gif.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start_s": {
+            "type": "number"
+          },
+          "duration_s": {
+            "type": "number"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "fps": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_from_frames",
+      "description": "Build an MP4 video from the PNG images in a workspace folder (sorted by name), saved as videos/<name>.mp4.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "fps": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "folder",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "video_slideshow",
+      "description": "Make a video from images, each shown for its own time. slides is a comma list of path:seconds, e.g. downloads/a.jpg:3,photos/b.png:4.5. Optional music is an audio file (mp3, m4a, wav): it loops if needed, fits the video length and fades out at the end. Saved to videos/<name>.mp4.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "slides": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "music": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "fps": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "slides",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "markdown_preview",
+      "description": "Turn a workspace Markdown file into a styled HTML page and return its dashboard preview link. Saves to previews/.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "run_python",
+      "description": "Run Python code in the workspace folder. The user must approve the exact code in the dashboard first. Call once without approval_id to request approval, then call again with the same code and the approval_id. Output is capped at 20,000 characters and the run stops after 60 seconds.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      }
+    },
+    {
+      "name": "approval_request",
+      "description": "Ask the user to approve something in the dashboard before you go on. what is a short label; detail is shown under it. Returns the request id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "what": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "what"
+        ]
+      }
+    },
+    {
+      "name": "approval_status",
+      "description": "Show the status of one approval request: pending, approved, denied, used, cancelled or expired.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "approval_id"
+        ]
+      }
+    },
+    {
+      "name": "list_approvals",
+      "description": "List approval requests, newest first. status filters to one state such as pending. limit caps the rows (max 100).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "cancel_approval",
+      "description": "Cancel a request that is still pending, so it can no longer be approved.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "approval_id"
+        ]
+      }
+    },
+    {
+      "name": "approval_cleanup",
+      "description": "Delete approval records older than days (default 7). Pending requests are always kept.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "approval_export",
+      "description": "Save every approval record to a JSON file in the workspace, for your records.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "approval_batch_add",
+      "description": "Add an approval request to a named batch, so the user can approve several things together. Batch names use letters, numbers, - and _.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "batch": {
+            "type": "string"
+          },
+          "what": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "batch",
+          "what"
+        ]
+      }
+    },
+    {
+      "name": "approval_batch_submit",
+      "description": "Mark a batch ready for the user, who approves its requests together in the dashboard. Lists what is in it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "batch": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "batch"
+        ]
+      }
+    },
+    {
+      "name": "approval_batch_release",
+      "description": "Check a batch. If every request in it is approved, reply Accepted! with the ids. Otherwise list what is still open.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "batch": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "batch"
+        ]
+      }
+    },
+    {
+      "name": "tts_generate",
+      "description": "Turn text into a WAV file in audio/<name>.wav using espeak (install in Termux with: pkg install espeak).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "voice": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "audio_info",
+      "description": "Report an audio file's duration, codec, sample rate and channels (uses ffprobe).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "audio_convert",
+      "description": "Convert an audio file to wav, mp3 or ogg into audio/<name>.<format>.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "audio_trim",
+      "description": "Cut an audio file from start_s to end_s (seconds) into audio/<name>.mp3. Use end_s 0 for the end.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "start_s": {
+            "type": "number"
+          },
+          "end_s": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "audio_volume",
+      "description": "Make an audio file louder (factor above 1) or quieter (factor below 1) into audio/<name>.mp3.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "factor": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "image_info",
+      "description": "Report an image's width, height and format (PNG, JPG, GIF or WebP) using ffprobe.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "image_resize",
+      "description": "Scale an image to a set width (height follows the ratio) into images/<name> in the same format.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "image_convert",
+      "description": "Convert an image between png, jpg and webp into images/<name>.<format>.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "diff_files",
+      "description": "Show what changed between two workspace text files as a unified diff (first max_lines lines).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "a": {
+            "type": "string"
+          },
+          "b": {
+            "type": "string"
+          },
+          "max_lines": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "name": "backup_file",
+      "description": "Save a timestamped copy of a workspace file into backups/ before you change it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "csv_to_json",
+      "description": "Convert a CSV file with a header row into a JSON array saved as data/<name>.json.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "json_to_csv",
+      "description": "Convert a JSON array of objects into a CSV file saved as data/<name>.csv.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "word_frequency",
+      "description": "List the most common words in a workspace text file, with counts (common stop words removed).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "top": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "project_preview_link",
+      "description": "Return the full dashboard preview link for a file in a project, e.g. index.html.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "project_check_all",
+      "description": "Run the HTML, local link, CSS, JavaScript, reduced-motion and image-alt checks on a project in one report.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "color_contrast",
+      "description": "Calculate the WCAG contrast ratio between two hex colors (e.g. #1a1a1a and #fff) and check the AA rules for text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "foreground": {
+            "type": "string"
+          },
+          "background": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "foreground",
+          "background"
+        ]
+      }
+    },
+    {
+      "name": "log_activity",
+      "description": "Add a row to activity.md with the current UTC time, action, tool, target and result. Earlier rows are never changed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "tool_name": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "tool_name",
+          "target",
+          "result"
+        ]
+      }
+    },
+    {
+      "name": "activity_summary",
+      "description": "Count how many times each tool name appears in activity.md, most used first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "system_status",
+      "description": "Show free disk space in the workspace and which helper programs are installed (ffmpeg, ffprobe, espeak, chromium, node, ngrok).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "tool_list",
+      "description": "List every registered tool name and the total count.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "phone_torch",
+      "description": "Turn the phone's flashlight on or off (Termux:API).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "on": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_notify",
+      "description": "Send a notification on the phone with a title and text. Reuse a notification_id to replace an earlier one.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "notification_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ]
+      }
+    },
+    {
+      "name": "phone_notify_remove",
+      "description": "Remove a notification that was sent with the given notification_id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "notification_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "notification_id"
+        ]
+      }
+    },
+    {
+      "name": "phone_toast",
+      "description": "Show a pop-up message on the phone screen (toast). short makes it display briefly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "short": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "phone_vibrate",
+      "description": "Vibrate the phone for a number of seconds, from 0.1 to 10.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "number"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_brightness",
+      "description": "Set the screen brightness, from 0 to 255.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "level"
+        ]
+      }
+    },
+    {
+      "name": "phone_volume",
+      "description": "Set the volume of one stream: alarm, call, music, notification, ring or system.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "stream": {
+            "type": "string"
+          },
+          "level": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_battery",
+      "description": "Report the battery level, charging state and temperature (Termux:API).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "phone_wifi",
+      "description": "Report the current Wi-Fi connection: network name, signal strength and IP address (Termux:API).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "phone_sensor",
+      "description": "List the phone's sensors when name is empty, or take one reading from a sensor, for example accelerometer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_audio_info",
+      "description": "Show the phone's audio status: volume levels and active audio streams (Termux:API).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "phone_speak",
+      "description": "Speak text out loud on the phone with its text-to-speech voice.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "phone_open_url",
+      "description": "Open a web link (http or https only) in the phone's browser. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "phone_media",
+      "description": "Play or stop audio on the phone. action is play (with a file path in the workspace) or stop.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      }
+    },
+    {
+      "name": "phone_clipboard_set",
+      "description": "Copy text to the phone's clipboard. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "phone_sms_send",
+      "description": "Send a text message (SMS). Needs the user's approval in the dashboard first. Call once without approval_id to request it, then again with the same arguments and the approval_id it returns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "message"
+        ]
+      }
+    },
+    {
+      "name": "phone_sms_list",
+      "description": "Read recent text messages from a box (inbox, sent, draft). Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "box": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_call",
+      "description": "Place a phone call. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "number"
+        ]
+      }
+    },
+    {
+      "name": "phone_call_log",
+      "description": "Read the recent call log. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_contacts",
+      "description": "List the phone's contacts. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_notify_list",
+      "description": "List the notifications currently on the phone, from any app. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_location",
+      "description": "Get the phone's location. provider is gps, network or passive. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_camera_photo",
+      "description": "Take a photo with the back camera (camera 0, the default; the front selfie camera is 1) and save it as images/<name>.jpg. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "camera_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_mic_record",
+      "description": "Record from the phone microphone for a number of seconds, from 1 to 60, into audio/<name>.m4a. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "seconds": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_clipboard_get",
+      "description": "Read what is on the phone's clipboard. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_wallpaper",
+      "description": "Set an image from the workspace as the phone wallpaper. Needs the user's approval in the dashboard each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "photo_cinematic",
+      "description": "Give a photo a cinematic look and show the result. style is teal-orange, noir or warm-film. letterbox adds widescreen black bars. Saves images/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "style": {
+            "type": "string"
+          },
+          "letterbox": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "multi_run_sequential",
+      "description": "Run up to 10 tool calls one after another, in order. calls is a JSON list of {\"tool\": name, \"arguments\": {...}}. With stop_on_error true, the rest are skipped after the first error.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calls": {
+            "type": "string"
+          },
+          "stop_on_error": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "calls"
+        ]
+      }
+    },
+    {
+      "name": "multi_run_pipeline",
+      "description": "Run up to 10 tool calls in order, where the text {prev} inside an argument is replaced by the previous call's result (first 2000 characters). Stops at the first error.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calls": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "calls"
+        ]
+      }
+    },
+    {
+      "name": "multi_run_with_retry",
+      "description": "Run up to 10 tool calls in parallel. A call that returns an error is tried again up to retries times (max 5).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calls": {
+            "type": "string"
+          },
+          "retries": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "calls"
+        ]
+      }
+    },
+    {
+      "name": "multi_run_with_timeout",
+      "description": "Run up to 10 tool calls in parallel and give up on any that take longer than timeout_s seconds (max 60).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calls": {
+            "type": "string"
+          },
+          "timeout_s": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "calls"
+        ]
+      }
+    },
+    {
+      "name": "job_start",
+      "description": "Start a tool in the background and return a job id at once. Check it with job_status and job_result. At most 10 jobs run at a time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tool_name": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_name"
+        ]
+      }
+    },
+    {
+      "name": "job_status",
+      "description": "Show whether a background job is running, done, failed or cancelled.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ]
+      }
+    },
+    {
+      "name": "job_result",
+      "description": "Get the result of a finished background job.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          },
+          "max_chars": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "job_id"
+        ]
+      }
+    },
+    {
+      "name": "job_cancel",
+      "description": "Stop waiting for a background job. Its result is thrown away; work already in progress may still finish.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id"
+        ]
+      }
+    },
+    {
+      "name": "job_list",
+      "description": "List background jobs and their states.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "tool_search_local",
+      "description": "Search tool names and descriptions for a word, to find the right tool.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "tool_describe",
+      "description": "Show one tool's full description and its parameters.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "tool_groups",
+      "description": "Show the tool groups (the first word of each tool name), how many tools each has, and whether it is switched off.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "tool_disable_group",
+      "description": "Hide a whole group of tools (for example phone or video) so Claude's tool list is shorter. Resets when the server restarts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "group"
+        ]
+      }
+    },
+    {
+      "name": "tool_enable_group",
+      "description": "Switch a hidden tool group back on.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "group"
+        ]
+      }
+    },
+    {
+      "name": "tool_usage_stats",
+      "description": "Show which tools have been used the most, from the activity log.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "tool_dry_run",
+      "description": "Check a tool call without running it: unknown tool, missing or unknown arguments, and whether it needs approval.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tool_name": {
+            "type": "string"
+          },
+          "arguments": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_name"
+        ]
+      }
+    },
+    {
+      "name": "server_health",
+      "description": "Show uptime, tool count, open sessions, pending approvals, log size and disk space.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "secrets_scan",
+      "description": "Look through workspace text files for things that look like keys, tokens or passwords. Shows file, line and kind only, never the value.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "audit_log_verify",
+      "description": "Check the activity log for damaged lines and show its size and time range.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "rotate_api_key",
+      "description": "Replace the default connection's API key with a new one. Needs the user's approval. The new key is saved to the key file and is not shown, so update the connector afterwards.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "workspace_snapshot",
+      "description": "Zip the whole workspace into the server's snapshot folder (outside the workspace) so it can be restored later. Refuses over 300 MB.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "workspace_restore",
+      "description": "Put files from a snapshot back into the workspace, overwriting files with the same path. Needs the user's approval.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "undo_last_write",
+      "description": "Put a file back to how it was before its last write_file, text_replace or append_file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "trash_file",
+      "description": "Move a file to the trash instead of deleting it. Can be undone with restore_from_trash. No approval needed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "restore_from_trash",
+      "description": "List trashed files (empty name) or put one back where it came from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "empty_trash",
+      "description": "Permanently delete everything in the trash. Needs the user's approval.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "permission_report",
+      "description": "Summarise who can connect, which connections are trusted, which tools need approval, and what is pending.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "regex_search",
+      "description": "Search workspace text files with a regular expression. Shows file, line number and the line.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pattern"
+        ]
+      }
+    },
+    {
+      "name": "regex_replace",
+      "description": "Replace text matching a regular expression in one file. Only counts the matches unless apply is true; applying saves an undo copy first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "replacement": {
+            "type": "string"
+          },
+          "apply": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "path",
+          "pattern",
+          "replacement"
+        ]
+      }
+    },
+    {
+      "name": "apply_patch",
+      "description": "Apply several exact text edits to one file all-or-nothing. edits is a JSON list of {\"old\": \"...\", \"new\": \"...\"}; each old text must appear exactly once.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "edits": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "edits"
+        ]
+      }
+    },
+    {
+      "name": "line_edit",
+      "description": "Replace lines start to end (1-based, inclusive) of a file with new_text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "start": {
+            "type": "integer"
+          },
+          "end": {
+            "type": "integer"
+          },
+          "new_text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "start",
+          "end",
+          "new_text"
+        ]
+      }
+    },
+    {
+      "name": "insert_lines",
+      "description": "Insert text after a line number (0 puts it at the top).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "after_line": {
+            "type": "integer"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "after_line",
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "delete_lines",
+      "description": "Delete lines start to end (1-based, inclusive) from a file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "start": {
+            "type": "integer"
+          },
+          "end": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "start",
+          "end"
+        ]
+      }
+    },
+    {
+      "name": "python_syntax_check",
+      "description": "Check a Python file for syntax errors without running it. No approval needed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "html_validate",
+      "description": "Check an HTML file for unclosed or stray tags.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "code_outline",
+      "description": "List the functions, classes and constants in a .py, .js or .css file with their line numbers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "todo_scan",
+      "description": "Find TODO, FIXME and HACK notes in workspace text files.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "markdown_toc",
+      "description": "Make a table of contents from a Markdown file's headings.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "json_get",
+      "description": "Read one value from a JSON file using a dotted path such as users.0.name. Empty key_path shows the whole file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "key_path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "json_set",
+      "description": "Set one value in a JSON file using a dotted path. value is parsed as JSON, or kept as text if it is not valid JSON.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "key_path": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "key_path",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "json_merge",
+      "description": "Merge the JSON object in other_path into the one in path (nested objects merge, other values are replaced).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "other_path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "other_path"
+        ]
+      }
+    },
+    {
+      "name": "csv_stats",
+      "description": "Summarise each column of a CSV: counts, and min, max and mean for number columns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "csv_filter",
+      "description": "Keep the CSV rows where a column matches, and save them as data/<name>.csv. mode is equals, contains, gt or lt (gt and lt compare numbers).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "column": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "column",
+          "value",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "csv_sort",
+      "description": "Sort a CSV by one column (numbers sort as numbers) and save it as data/<name>.csv.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "column": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "descending": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "path",
+          "column",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "sqlite_query",
+      "description": "Run a read-only SELECT on a SQLite database in the workspace. Nothing can be changed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sql": {
+            "type": "string"
+          },
+          "max_rows": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "sql"
+        ]
+      }
+    },
+    {
+      "name": "sqlite_execute",
+      "description": "Run a SQL statement that changes a SQLite database (insert, update, create, delete). Needs the user's approval, who sees the exact SQL.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sql": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sql"
+        ]
+      }
+    },
+    {
+      "name": "xml_to_json",
+      "description": "Convert an XML file into JSON saved as data/<name>.json.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "csv_to_svg_chart",
+      "description": "Draw a simple bar chart (first 30 rows) from two CSV columns as charts/<name>.svg.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "label_column": {
+            "type": "string"
+          },
+          "value_column": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "label_column",
+          "value_column",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "http_request",
+      "description": "Make an HTTP request to a public address. GET and HEAD run at once. POST, PUT, PATCH and DELETE need the user's approval. Returns the status, some headers and the first 4000 characters of the body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "rss_read",
+      "description": "Read an RSS or Atom feed and list its newest items with title, date and link.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "max_items": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "sitemap_urls_all",
+      "description": "List page addresses from a site's sitemap.xml, following sitemap index files (up to 3 levels).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "max_urls": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "page_to_markdown",
+      "description": "Turn a public web page into Markdown saved as docs/<name>.md.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "extract_tables",
+      "description": "Save every table on a public page as data/<name>-1.csv, data/<name>-2.csv and so on (first 10 tables).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "download_many",
+      "description": "Download several public files (one address per line, up to 10, each up to 100 MB) into a workspace folder. Needs the user's approval once for the whole list unless the connection is trusted.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "string"
+          },
+          "folder": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "urls"
+        ]
+      }
+    },
+    {
+      "name": "api_json_fetch",
+      "description": "Fetch JSON from a public API (GET) and optionally pick one value with a dotted path such as data.items.0.name.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "key_path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "url_expand",
+      "description": "Follow a short link's redirects and show where it ends up, without downloading the page.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "url_status_bulk",
+      "description": "Check the HTTP status of up to 20 public addresses (one per line) at the same time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "urls"
+        ]
+      }
+    },
+    {
+      "name": "site_snapshot",
+      "description": "Save one public page's HTML, readable text and response headers into projects/experimental/<name>/ for later reference.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "browser_goto",
+      "description": "Go to another public address inside an open browser session.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "browser_back",
+      "description": "Go back one page in a browser session.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_reload",
+      "description": "Reload the current page in a browser session.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_run_js",
+      "description": "Run a JavaScript expression in the page and return its result. Needs the user's approval each time, who sees the exact code.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "code"
+        ]
+      }
+    },
+    {
+      "name": "browser_get_element_text",
+      "description": "Return the text of one element, found by CSS selector or visible text.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "target"
+        ]
+      }
+    },
+    {
+      "name": "browser_find_all",
+      "description": "List clickable things on the page whose text contains the given words, with the pixel position of each centre. Use the position with browser_click_xy when a normal click picks the wrong element.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "max_results": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id",
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "browser_click_xy",
+      "description": "Click the exact pixel (x, y) of the page with a real mouse click, for buttons a text click misses. Clicks on things that look like login, submit, accept, pay or approve need the user's approval, as with browser_click.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "x": {
+            "type": "integer"
+          },
+          "y": {
+            "type": "integer"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "x",
+          "y"
+        ]
+      }
+    },
+    {
+      "name": "browser_pixel_grid",
+      "description": "Take a screenshot with a labelled pixel grid drawn on top, so you can read off coordinates for browser_click_xy. Saves screenshots/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "step": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_wait_idle",
+      "description": "Wait until the page has stopped loading and no new network requests arrive for one second.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "timeout_s": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "browser_emulate_device",
+      "description": "Make a browser session look like a phone, tablet or desktop: size, touch and user agent. device is iphone, android, ipad or desktop.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "device": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      }
+    },
+    {
+      "name": "pdf_info",
+      "description": "Show a PDF's page count, title and size (uses pdfinfo; install with: pkg install poppler).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "pdf_extract_text",
+      "description": "Read the text of a PDF (uses pdftotext). last_page 0 means to the end.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "first_page": {
+            "type": "integer"
+          },
+          "last_page": {
+            "type": "integer"
+          },
+          "max_chars": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "pdf_to_images",
+      "description": "Turn PDF pages into PNG images in images/<name>-N.png (at most 10 pages, uses pdftoppm).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "first_page": {
+            "type": "integer"
+          },
+          "last_page": {
+            "type": "integer"
+          },
+          "dpi": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "pdf_merge",
+      "description": "Join several PDFs (comma-separated workspace paths, in order) into pdfs/<name>.pdf (uses pdfunite).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "paths",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "image_crop",
+      "description": "Cut a rectangle out of an image (x, y is the top-left corner) into images/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "x": {
+            "type": "integer"
+          },
+          "y": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name",
+          "x",
+          "y",
+          "width",
+          "height"
+        ]
+      }
+    },
+    {
+      "name": "image_rotate",
+      "description": "Rotate an image by 90, 180 or 270 degrees into images/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "degrees": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "image_compress",
+      "description": "Make a smaller JPG copy of an image. quality is 1 (smallest) to 100 (best). Saves images/<name>.jpg.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quality": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "image_filter",
+      "description": "Apply an effect to an image into images/<name>.png. effect is grayscale, blur, sharpen, invert or sepia.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "image_contact_sheet",
+      "description": "Put all the images of one type in a folder onto one sheet of thumbnails, saved as images/<name>.png.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "columns": {
+            "type": "integer"
+          },
+          "thumb_width": {
+            "type": "integer"
+          },
+          "extension": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "audio_concat",
+      "description": "Join several audio files (comma-separated workspace paths, in order) into audio/<name>.mp3.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "paths",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "phone_dialog_confirm",
+      "description": "Show a Yes/No pop-up on the phone and return what the user chose. Use it to ask the user in person (Termux:API).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "hint": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      }
+    },
+    {
+      "name": "phone_dialog_text",
+      "description": "Ask the user to type an answer in a pop-up on the phone and return it (Termux:API).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "hint": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      }
+    },
+    {
+      "name": "phone_fingerprint_check",
+      "description": "Ask for a fingerprint on the phone and report success or failure (Termux:API). Does not approve anything by itself.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "phone_notify_buttons",
+      "description": "Send a notification with one or two buttons. The buttons show a short toast when pressed (Termux:API).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "button1": {
+            "type": "string"
+          },
+          "button2": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ]
+      }
+    },
+    {
+      "name": "phone_storage_info",
+      "description": "Show free and total storage on the phone's home folder.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "phone_share_file",
+      "description": "Open the phone's share sheet for a workspace file, so the user can send it to an app. Needs the user's approval each time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "git_status",
+      "description": "Show the git status of the workspace (changed and new files).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "git_diff",
+      "description": "Show uncommitted changes in the workspace, or in one file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "max_lines": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "git_commit",
+      "description": "Stage everything in the workspace and commit it with a message. Needs the user's approval.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      }
+    },
+    {
+      "name": "note_add",
+      "description": "Add a dated note to notes.md in the workspace.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "task_add",
+      "description": "Add a checkbox task to tasks.md in the workspace. due is optional, for example 2026-12-01.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "due": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    },
+    {
+      "name": "project_template",
+      "description": "Create a starter web project in projects/<name>. kind is blank, landing or portfolio. Refuses if the project already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    }
+  ]
+}
